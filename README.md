@@ -1,2 +1,2 @@
 # SWE_681
-A client-server 2 Truths and a Lie game
+A client-server arithmetic guessing and solving game.
