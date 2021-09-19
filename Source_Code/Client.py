@@ -1,13 +1,16 @@
 import pygame
 #from network import Network
-from network_ssl import Network
+#from network_ssl import Network
 import pickle
-pygame.font.init()
 
-width = 700
-height = 700
-win = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Client")
+def win():
+    pygame.font.init()
+    width = 700
+    height = 700
+    win = pygame.display.set_mode((width, height))
+    pygame.display.set_caption("Client")
+
+
 
 
 class Button:
@@ -130,9 +133,10 @@ btns = [Button("1*", 50, 400, (0,0,0)), Button("2*", 200, 400, (0,0,0)), Button(
 def main():
     run = True
     clock = pygame.time.Clock()
-    n = Network()
-    player = int(n.getP())
-    print("You are player", player)
+    #n = Network()
+    #player = int(n.getP())
+    #print("You are player", player)
+    win = win()
     winner = -1
     m1 = ""
     m2 = ""
@@ -180,7 +184,7 @@ def main():
                 win.blit(text, (width/2 - text.get_width()/2, height/2 - text.get_height()/2))
                 pygame.display.update()
                 pygame.time.delay(4000)
-                menu_screen()
+                menu_screen(win)
             pygame.time.delay(2000)
 
 
@@ -203,7 +207,7 @@ def main():
 
         redrawWindow(win, game, player, winner, m1, m2, list1, list2)
 
-def menu_screen():
+def menu_screen(win):
     run = True
     clock = pygame.time.Clock()
 
@@ -225,9 +229,9 @@ def menu_screen():
 
 
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+    #main()
 
-while True:
-    menu_screen()
+#while True:
+    #menu_screen()
 
