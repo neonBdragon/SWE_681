@@ -30,7 +30,8 @@ class Network:
         except:
             pass
 
-#
+
+
     def send(self, data):
         try:
             self.client.send(str.encode(data))
