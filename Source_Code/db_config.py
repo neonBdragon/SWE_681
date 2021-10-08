@@ -4,7 +4,7 @@ import getpass
 from cryptography.fernet import Fernet
 
 # DB password
-raw_pw = 'ooneegha'
+raw_pw = '' #Stored in an encrytpted text and read in for security
 
 # random key from key generator
 key = Fernet.generate_key()
