@@ -5,6 +5,7 @@ const mysql = require('mysql');
 const RpsGame = require('./rps-game');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const fs = require('fs');
 
 const app = express();
 
@@ -13,7 +14,12 @@ console.log(`Serving static from ${clientPath}`);
 
 app.use(express.static(clientPath));
 
-const server = http.createServer(app);
+const options = {
+    key: fs.readFileSync('ssl/server.key'),
+    cert: fs.readFileSync('ssl/server.crt')
+};
+
+const server = http.createServer(options); //Changed from express app to http options config
 
 const io = socketio(server);
 const sessionMiddleware = session({
