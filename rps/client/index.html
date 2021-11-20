@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>RPS</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+<div class="n_log_in" id="divlog">
+  <input type="text" id="userName" placeholder="Username..." /><br>
+  <input type="password" id ="Password" placeholder="Password..." /><br>
+  <button id="Login_Register">Login / Register</button>
+</div>
+<div class="join" id="joingame">
+  <form id="join-form">
+    <button id="leave game" class="turn" >Leave</button>
+  </form>
+</div>
+<div class="join" id="yesno">
+  <form id="join-game">
+    <button id="yes" class="turn" >yes</button>
+    <button id="no" class="turn" >no</button>
+  </form>
+</div>
+<div id="div1" class="rps-wrapper">
+  <ul id="events"></ul>
+  <div class="controls">
+    <div class="chat-wrapper">
+      <form id="chat-form">
+        <input id="chat" autocomplete="off" title="chat"/>
+        <button id="say">Say</button>
+      </form>
+    </div>
+
+    <div class="button-wrapper" id="buttons">
+      <button id="200" class="turn">200</button>
+      <button id="150" class="turn">150</button>
+      <button id="100" class="turn">100</button>
+      <button id="75" class="turn">75</button>
+      <button id="50" class="turn">50</button>
+      <button id="25" class="turn">25</button>
+      <button id="10" class="turn">10</button>
+      <button id="Leave" class="turn">Leave</button>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="src/client.js"></script>
+</body>
+</html>
