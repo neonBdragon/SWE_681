@@ -6,6 +6,7 @@ const RpsGame = require('./rps-game');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const fs = require('fs');
+const https = require("https");
 
 const app = express();
 
@@ -15,11 +16,14 @@ console.log(`Serving static from ${clientPath}`);
 app.use(express.static(clientPath));
 
 const options = {
-    key: fs.readFileSync('ssl/server.key'),
-    cert: fs.readFileSync('ssl/server.crt')
+    key: fs.readFileSync('../../ssl/server.key'),
+    cert: fs.readFileSync('../../ssl/server.crt')
 };
 
-const server = http.createServer(options); //Changed from express app to http options config
+//const server = http.createServer(options, app); //This server declaration caused issues for reasons I don't understand
+const server = https.createServer(options, app).listen(8080, function () {
+    console.log('RPS started on 8080! Go to https://localhost:8080')
+});
 
 const io = socketio(server);
 const sessionMiddleware = session({
@@ -52,6 +56,7 @@ let waitingPlayer = null;
 app.use(express.static('./'));
 var users = [];
 var usersocks = [];
+
 io.on('connection', (sock) => {
   var req = sock.request;
   if(req.session.userID != null){
@@ -69,11 +74,7 @@ io.on('connection', (sock) => {
         if(rows.length == 0){
             console.log("nothing here");
             sock.emit("No User","Invalid Password and/or Username!");
-            /*db.query("INSERT INTO accounts(`username`, `password`) VALUES(?, ?)", [user, pass], function(err, result){
-              if(!!err)
-              throw err;
 
-              console.log(result);*/
               //io.emit("logged_in", {user: user});
             //});
         }else{
@@ -259,6 +260,6 @@ server.on('error', (err) => {
   console.error('Server error:', err);
 });
 
-server.listen(8080, () => {
-  console.log('RPS started on 8080');
-});
+/*server.listen(8080, () => {
+  console.log('RPS started on 8080! Go to https://localhost:8080');
+});*/ // Not needed as added listen to the server declaration
