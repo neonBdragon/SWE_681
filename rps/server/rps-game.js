@@ -1,18 +1,28 @@
 class RpsGame {
 
   constructor(p1, p2) {
+    this.lostTurns1 = [];
+    this.lostTurns2 = [];
     this._players = [p1, p2];
+    this._player1money = 0.00;
+    this._player2money = 0.00;
     this._turns = [null, null];
+    this.answer1 = null;
+    this.answer2 = null;
     this.list = ['*', '/', '+', '-'];
     this.operator = this.list[Math.floor(Math.random()*this.list.length)];
     this.val = Math.floor(Math.random() *(100 - 50)) + 50;
     this.count1 = 7;
     this.count2 = 7;
-    this._sendToPlayers('Rock Paper Scissors Starts!');
+    this.moneypool = 0.00;
+    this._sendToPlayers('Arithematic Guess Game Starts!');
     this._sendToPlayers('Value for the game: ' + this.val);
     this._players.forEach((player, idx) => {
       player.on('turn', (turn) => {
         this._onTurn(idx, turn);
+      });
+      player.on('Bet', (bet) =>{
+        this.moneypool = this.moneypool + bet;
       });
 
     });
@@ -58,14 +68,25 @@ class RpsGame {
     }
     if(this.count1 == 1 || this.count2 == 1){
         this._sendToPlayers('Match Over!!!!');
+
+        if(this.count1 == 1){
+            this._sendToPlayers('Player 2 Wins!')
+            this._player2money = this._player2money + this.moneypool;
+        }
+        if(this.count2 == 1){
+            this._sendToPlayers('Player 1 Wins!')
+            this._player1money = this._player1money + this.moneypool;
+        }
         this.count1 == 7;
         this.count2 == 7;
+        this.lostTurns1 = [];
+        this.lostTurns2 = [];
         this.operator = this.list[Math.floor(Math.random()*this.list.length)];
         this.val = Math.floor(Math.random() *(100 - 50)) + 50;
         this._players.forEach((player) => {
               player.emit('reset', 'newMatch');
         });
-        this._sendToPlayers('Rock Paper Scissors Starts!');
+        this._sendToPlayers('Arithematic Game Starts!!');
         this._sendToPlayers('Value for the game' + this.val);
 
     }
@@ -74,8 +95,8 @@ class RpsGame {
 
   _getGameResult() {
 
-    const p0 = this._decodeTurn(this._turns[0]);
-    const p1 = this._decodeTurn(this._turns[1]);
+    const p0 = this._decodeTurn(this._turns[0], "1");
+    const p1 = this._decodeTurn(this._turns[1], "2");
     var outcome1 = -1;
     var outcome2 = -1;
     switch(this.operator){
@@ -102,9 +123,11 @@ class RpsGame {
         this._sendToPlayers('Draw!');
     }else if(outcome1 > outcome2){
         this._sendWinMessage(this._players[0], this._players[1], this._turns[1]);
+        this.lostTurns2.push(this._turns[1]);
         message = "player2";
     }else{
         this._sendWinMessage(this._players[1], this._players[0], this._turns[0]);
+        this.lostTurns1.push(this._turns[0]);
         message = "player1";
     }
     return message;
@@ -119,24 +142,30 @@ class RpsGame {
     loser.emit('loser', losing_turn);
   }
 
-  _decodeTurn(turn) {
-    switch (turn) {
-      case '200':
-        return 200;
-      case '150':
-        return 150;
-      case '100':
-        return 100;
-      case '75':
-        return 75;
-      case '50':
-        return 50;
-      case '25':
-        return 25;
-      case '10':
-        return 10;
-      default:
-        throw new Error(`Could not decode turn ${turn}`);
+  _decodeTurn(turn, player) {
+    if(player == "1" && this.lostTurns1.includes(turn)){
+        throw new Error(`This value has already been lost by the player`);
+    }else if(player == "2" && this.lostTurns2.includes(turn)){
+        throw new Error(`This value has already been lost by the player`);
+    }else{
+        switch (turn) {
+          case '200':
+            return 200;
+          case '150':
+            return 150;
+          case '100':
+            return 100;
+          case '75':
+            return 75;
+          case '50':
+            return 50;
+          case '25':
+            return 25;
+          case '10':
+            return 10;
+          default:
+            throw new Error(`Could not decode turn ${turn}`);
+        }
     }
   }
 

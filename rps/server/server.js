@@ -7,7 +7,6 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const fs = require('fs');
 const https = require("https");
-
 const app = express();
 
 const clientPath = `${__dirname}/../client`;
@@ -60,17 +59,22 @@ var usersocks = [];
 io.on('connection', (sock) => {
   var req = sock.request;
   if(req.session.userID != null){
-      db.query("SELECT * FROM accounts WHERE id=?", [req.session.userID], function(err, rows, fields){
-      io.emit("logged_in", {user: rows[0].Username});
+      var userId = req.session.userID;
+      var sql = "SELECT * FROM accounts WHERE id=" + db.escape(userID);
+      db.query(sql, function(err, rows, fields){
+        if(error) throw error;
+        io.emit("logged_in", {user: rows[0].Username});
       });
     }
 
   sock.on("log", (data) => {
     var allGood = false;
     var found = false;
+    var inall = false;
     user = data[0];
     pass = data[1];
-    db.query("SELECT * FROM accounts WHERE username=?", [user], function(err, rows, fields){
+    var sql = "SELECT * FROM accounts WHERE username=" + db.escape(user);
+    db.query(sql, function(err, rows, fields){
         if(rows.length == 0){
             console.log("nothing here");
             sock.emit("No User","Invalid Password and/or Username!");
@@ -81,7 +85,7 @@ io.on('connection', (sock) => {
             console.log("here");
             var found = true;
         }
-        if(found){
+        if(found && !(users.includes(user))){
             const dataUser = rows[0].username;
             const dataPass = rows[0].password;
             if(dataPass == null || dataUser == null){
@@ -102,6 +106,7 @@ io.on('connection', (sock) => {
             }
             if(allGood == true){
                 users.push(dataUser);
+                console.log(users);
                 usersocks.push(sock);
                 //io.emit("unhide waiting", dataUser);
                 //sock.emit("unhidew", "unhide");
@@ -119,6 +124,10 @@ io.on('connection', (sock) => {
 
 
             }
+        }
+        if(found && users.includes(user)){
+            console.log("This user is already logged in!");
+            sock.emit("No User", "Invalid Password and/or Username!");
         }
         });
 
@@ -183,8 +192,8 @@ io.on('connection', (sock) => {
     if(text.includes("Bet ")){
         var a = text.split(" ");
         var b = parseFloat(a[1]);
-        money = money + b;
-        io.emit('message', 'bet is in! ' + money);
+        sock.emit('Bet', b);
+        io.emit('message', 'bet is in! ' + b);
     }
     io.emit('message', text);
   });
