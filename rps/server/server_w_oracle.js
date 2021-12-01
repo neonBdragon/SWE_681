@@ -1,11 +1,12 @@
-const http = require('http');
+const oracledb = require('oracledb')
+const dbConfig = require('./dbconfig.js');
 const express = require('express');
 const socketio = require('socket.io');
-const mysql = require('mysql');
 const RpsGame = require('./rps-game');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const fs = require('fs');
+const https = require("https");
 
 const app = express();
 
@@ -15,11 +16,18 @@ console.log(`Serving static from ${clientPath}`);
 app.use(express.static(clientPath));
 
 const options = {
-    key: fs.readFileSync('ssl/server.key'),
-    cert: fs.readFileSync('ssl/server.crt')
+    key: fs.readFileSync('../../ssl/server.key'),
+    cert: fs.readFileSync('../../ssl/server.crt')
 };
 
-const server = http.createServer(options); //Changed from express app to http options config
+//const server = http.createServer(options, app); //This server declaration caused issues for reasons I don't understand
+const server = https.createServer(options, app).listen(8081, function () {
+    console.log('RPS started on 8081! Go to https://localhost:8081')
+});
+
+server.on('error', (err) => {
+    console.error('Server error:', err);
+});
 
 const io = socketio(server);
 const sessionMiddleware = session({
@@ -28,30 +36,71 @@ const sessionMiddleware = session({
 io.use(function (sock, next){
     sessionMiddleware(sock.request, sock.request.res, next);
 });
-const config = {
-    "host": "localhost",
-    "user": "root",
-    "password": 'Lina&$thatsmyhoney2019',
-    "base": 'login_info'
-};
 
-var db = mysql.createConnection({
-    host: config.host,
-    user: config.user,
-    password: config.password,
-    database: config.base
-});
+try {
+    oracledb.initOracleClient({libDir: './instantclient_21_3'});
+} catch (err) {
+    console.error("Whoops!");
+    console.error(err.message);
+}
 
-db.connect(function (error){
-    if(!!error){
-        throw error;
+/*
+oracledb.getConnection({
+    user: 'bmack4',
+    password: 'thootcho',
+    connectString: 'artemis.vsnet.gmu.edu:1521/vse18c.vsnet.gmu.edu'
+}, function (err, connection) {
+    if (err) {
+        console.error((err.message));
+        return;
     }
-    console.log('mysql connected');
+
+    connection.execute("SELECT * FROM GAME", [], function (err, result) {
+        if (err) {
+            console.error(err.message);
+            doRelease(connection);
+            return;
+        }
+
+        console.log(result.metaData);
+        console.log(result.rows);
+        //doRelease(connection);
+    });
 });
+ */
+
+oracledb.getConnection(dbConfig, function (err, connection) {
+    if (err) {
+        console.error((err.message));
+        return;
+    }
+
+    connection.execute("SELECT * FROM GAME", [], function (err, result) {
+        if (err) {
+            console.error(err.message);
+            doRelease(connection);
+            return;
+        }
+
+        console.log(result.metaData);
+        console.log(result.rows);
+        //doRelease(connection);
+    });
+});
+
+function doRelease(connection) {
+    connection.release(function (err) {
+        if (err) {
+            console.error(err.message);
+        }
+    });
+}
+
 let waitingPlayer = null;
 app.use(express.static('./'));
 var users = [];
 var usersocks = [];
+
 io.on('connection', (sock) => {
     var req = sock.request;
     if(req.session.userID != null){
@@ -69,11 +118,7 @@ io.on('connection', (sock) => {
             if(rows.length == 0){
                 console.log("nothing here");
                 sock.emit("No User","Invalid Password and/or Username!");
-                /*db.query("INSERT INTO accounts(`username`, `password`) VALUES(?, ?)", [user, pass], function(err, result){
-                  if(!!err)
-                  throw err;
 
-                  console.log(result);*/
                 //io.emit("logged_in", {user: user});
                 //});
             }else{
@@ -253,12 +298,4 @@ io.on('connection', (sock) => {
     });
 
 
-});
-
-server.on('error', (err) => {
-    console.error('Server error:', err);
-});
-
-server.listen(8080, () => {
-    console.log('RPS started on 8080');
 });
