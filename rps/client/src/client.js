@@ -123,7 +123,7 @@ const addButtonListeners = () => {
 };
 const addButtonListeners2 = () => {
 
-  ['Login_Register', 'Leave', 'yes', 'no'].forEach((id) => {
+  ['Login_Register', 'Leave', 'yes', 'no', 'Login_RegisterNew'].forEach((id) => {
     const button = document.getElementById(id);
     button.addEventListener('click', () => {
         if(id == "Leave"){
@@ -135,6 +135,12 @@ const addButtonListeners2 = () => {
             var pass = document.getElementById("Password").value;
             var data = [user, pass];
             sock.emit('log', data);
+        }else if(id == 'Login_RegisterNew'){
+            var user = document.getElementById("userNameNew").value;
+            username = user;
+            var pass = document.getElementById("PasswordNew").value;
+            var data = [user, pass];
+            sock.emit('New', data);
         }else{
             if(id == 'yes'){
                 sock.emit("response", "yes");
@@ -149,6 +155,7 @@ const addButtonListeners2 = () => {
 };
 const gamepage = (e) => {
     login.style.visibility = "hidden";
+    signup.style.visibility = "hidden";
     game.style.visibility = "visible";
     writeEvent('Welcome to RPS');
     writeEvent('New Match!');
@@ -160,13 +167,11 @@ const unhidew = (e) => {
 };
 var username = "";
 var playwith = "";
-const yesno = document.getElementById("yesno");
+
 const game = document.getElementById("div1");
 const login = document.getElementById("divlog");
-const wait = document.getElementById("joingame");
-wait.style.visibility = "hidden";
+const signup = document.getElementById("divlog2");
 game.style.visibility = "hidden";
-yesno.style.visibility = "hidden";
 const sock = io.connect();
 sock.on('play', play);
 sock.on('message', writeEvent);

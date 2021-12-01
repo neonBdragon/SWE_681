@@ -132,6 +132,34 @@ io.on('connection', (sock) => {
         });
 
   });
+  sock.on('New', (text) =>{
+    user = text[0];
+    pass = text[1];
+    var sql = "SELECT * FROM accounts WHERE username=" + db.escape(user);
+    db.query(sql, function(err, rows, fields){
+            if(rows.length == 0){
+                console.log("nothing here, good to sign up");
+                console.log(user);
+                console.log(pass);
+                sql = "INSERT into accounts (username, password) VALUES (" + db.escape(user) + ", " + db.escape(pass) + ")";
+                var post  = {username: user, password: pass};
+                var query = db.query('INSERT INTO accounts SET ?', post, function (error, results, fields) {
+                  if (error) throw error;
+                  // Neat!
+                });
+                console.log(query.sql); // INSERT INTO posts SET `id` = 1, `title` = 'Hello MySQL
+                db.query(sql, function(err, rows, fields){});
+                console.log("New Account!");
+                sock.emit("No User", "Successful Registration. Please sign in above");
+                  //io.emit("logged_in", {user: user});
+                //});
+            }else{
+                console.log("here");
+                var found = true;
+                sock.e
+            }
+    });
+  });
   sock.on('join', (text) =>{
     var user = text[0];
     var user2 = text[1];
@@ -225,42 +253,7 @@ io.on('connection', (sock) => {
             console.log(users[i]);
           }
   });
-  sock.on("login_register", function(data){
-    const user = data.user,
-    pass = data.pass;
-    db.query("SELECT * FROM accounts WHERE username=?", [user], function(err, rows, fields){
-    if(rows.length == 0){
-        console.log("nothing here");
-        db.query("INSERT INTO accounts(`username`, `password`) VALUES(?, ?)", [user, pass], function(err, result){
-          if(!!err)
-          throw err;
 
-          console.log(result);
-          io.emit("logged_in", {user: user});
-        });
-    }else{
-        console.log("here");
-    }
-    const dataUser = rows[0].username;
-    const dataPass = rows[0].password;
-    if(dataPass == null || dataUser == null){
-      io.emit("error");
-      console.log("Error");
-    }
-    if(user == dataUser && pass == dataPass){
-      io.emit("logged_in", {user: user});
-      io.emit("switch");
-      req.session.userID = rows[0].id;
-      req.session.save();
-      req.session.save();
-      console.log("session id saved");
-
-    }else{
-      io.emit("invalid");
-      console.log("invalid session");
-    }
-    });
-  });
 
 
 });
