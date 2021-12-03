@@ -19,13 +19,13 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
   $(document).ready(function(){
-  const socket = io();
-  $("#Login_Register").click(function(){
-  socket.emit("login_register", {
-  user: $("#userName").val(),
-  pass: $("#Password").val()
-  });
-  });
+      const socket = io();
+      $("#Login_Register").click(function(){
+          socket.emit("login_register", {
+          user: $("#userName").val(),
+          pass: $("#Password").val()
+          });
+      });
   });
   socket.on("logged_in", function(name){
   $("#n_log_in").hide();

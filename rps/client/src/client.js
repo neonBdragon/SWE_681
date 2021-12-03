@@ -122,35 +122,40 @@ const addButtonListeners = () => {
   });
 };
 const addButtonListeners2 = () => {
-
   ['Login_Register', 'Leave', 'yes', 'no', 'Login_RegisterNew'].forEach((id) => {
     const button = document.getElementById(id);
-    button.addEventListener('click', () => {
-        if(id == "Leave"){
-            sock.emit("remove user", username);
-            location.reload();
-        }else if(id == 'Login_Register'){
-            var user = document.getElementById("userName").value;
-            username = user;
-            var pass = document.getElementById("Password").value;
-            var data = [user, pass];
-            sock.emit('log', data);
-        }else if(id == 'Login_RegisterNew'){
-            var user = document.getElementById("userNameNew").value;
-            username = user;
-            var pass = document.getElementById("PasswordNew").value;
-            var data = [user, pass];
-            sock.emit('New', data);
-        }else{
-            if(id == 'yes'){
-                sock.emit("response", "yes");
-                yesno.style.visibility = "hidden";
+    try {
+        button.addEventListener('click', () => {
+            if(id === 'Leave'){
+                sock.emit("remove user", username);
+                location.reload();
+            }else if(id === 'Login_Register'){
+                var user = document.getElementById("userName").value;
+                username = user;
+                var pass = document.getElementById("Password").value;
+                var data = [user, pass];
+                sock.emit('log', data);
+            }else if(id === 'Login_RegisterNew'){
+                var user = document.getElementById("userNameNew").value;
+                username = user;
+                var pass = document.getElementById("PasswordNew").value;
+                var data = [user, pass];
+                sock.emit('New', data);
+                document.getElementById("userNameNew").value = "";
+                var pass = document.getElementById("PasswordNew").value = "";
             }else{
-                sock.emit("response", "no");
-                yesno.style.visibility = "hidden";
+                if(id === 'yes'){
+                    sock.emit("response", "yes");
+                    yesno.style.visibility = "hidden";
+                }else{
+                    sock.emit("response", "no");
+                    yesno.style.visibility = "hidden";
+                }
             }
-        }
-    });
+        });
+    } catch (err) {
+        console.log(err.message);
+    }
   });
 };
 const gamepage = (e) => {
