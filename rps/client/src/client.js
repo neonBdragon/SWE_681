@@ -2,12 +2,7 @@ const array = [];
 
 
 const writeEvent = (text) => {
-  if(text == "login"){
-    login.style.visibility = "hidden";
-    game.style.visibility = "visible";
-    writeEvent('Welcome to RPS');
-    writeEvent('New Match!');
-  }else{
+
       // <ul> element
       const parent = document.querySelector('#events');
 
@@ -16,7 +11,7 @@ const writeEvent = (text) => {
       el.innerHTML = text;
 
       parent.appendChild(el);
-  }
+
 };
 
 const noUser = (text) => {
@@ -112,7 +107,7 @@ const onFormSubmitted = (e) => {
   const text = input.value;
   input.value = '';
 
-  sock.emit('message', text);
+  sock.emit('message', username + ": " + text);
 };
 
 const addButtonListeners = () => {
