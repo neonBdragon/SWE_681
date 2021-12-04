@@ -9,7 +9,9 @@ input {
   font-size: 1.0rem;
   padding: 0 5px;
 }
-
+.n_log_in {
+    text-align: center;
+}
 button {
   text-transform: uppercase;
   font-size: 0.8rem;
