@@ -88,6 +88,9 @@ const loser = (text) => {
 };
 
 const reset = (text) => {
+    rem = document.getElementById("Leave");
+    array.push(rem);
+    rem.parentNode.removeChild(rem);
     const parent = document.querySelector('#buttons');
 
       // <li> element
