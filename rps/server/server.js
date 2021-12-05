@@ -7,6 +7,8 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const fs = require('fs');
 const https = require("https");
+const bcrypt = require("bcrypt");
+const salt = 10;
 const app = express();
 
 const clientPath = `${__dirname}/../client`;
@@ -77,113 +79,94 @@ io.on('connection', (sock) => {
     user = data[0];
     pass = data[1];
     var sql = "SELECT * FROM accounts WHERE username=" + db.escape(user);
-    db.query(sql, function(err, rows, fields){
-        if(rows.length == 0){
-            console.log("nothing here");
-            sock.emit("No User","Invalid Password and/or Username!");
+    if(loginregex.test(pass) == true && loginregex.test(user) == true && user != pass){
 
-              //io.emit("logged_in", {user: user});
-            //});
-        }else{
-            console.log("here");
-            var found = true;
-        }
-        if(found && !(users.includes(user))){
-            const dataUser = rows[0].username;
-            const dataPass = rows[0].password;
-            const dataWin = rows[0].Wins;
-            const dataLoss = rows[0].Losses;
-            var stats = "User: " + dataUser + " Wins: " + dataWin + "Losses: " + dataLoss;
-            messages.push(stats);
-            if(dataPass == null || dataUser == null){
-              sock.emit("No User", "Invalid Password and/or Username!");
-              console.log("Error");
-            }
-            if(user == dataUser && pass == dataPass){
-              sock.emit("No User", "Successful Sign In!");
-              req.session.userID = rows[0].id;
-              req.session.save();
-              req.session.save();
-              console.log("session id saved");
-              allGood = true;
-
-            }else{
-              sock.emit("No User", "Invalid Password and/or Username!");
-              console.log("invalid session");
-            }
-
-            if(allGood == true){
-                users.push(dataUser);
-                console.log(users);
-                usersocks.push(sock);
-                gameUsers.push(dataUser);
-                console.log(gameUsers);
-                //io.emit("unhide waiting", dataUser);
-                //sock.emit("unhidew", "unhide");
-                console.log(dataUser);
-
-                if (waitingPlayer) {
-
-                    sock.emit("unhide");
-                    new RpsGame(waitingPlayer, sock, db, gameUsers);
-                    waitingPlayer = null;
-                    gameUsers = [];
-                  } else {
-                    waitingPlayer = sock;
-                    waitingPlayer.emit("unhide");
-                    waitingPlayer.emit('message', 'Waiting for an opponent');
-                }
-
-
-            }
-        }
-        if(found && users.includes(user)){
-            console.log("This user is already logged in!");
-            sock.emit("No User", "Invalid Password and/or Username!");
-        }
-        });
-
-  });
-  sock.on('update', (text) =>{
-     console.log('Hello new')
-        status = text[0];
-        user = text[1];
-        var sql = "SELECT * FROM accounts WHERE username=" + db.escape(user);
-        console.log(pass);
-        console.log(loginregex.test(pass));
         db.query(sql, function(err, rows, fields){
+            if(rows.length == 0){
+                console.log("nothing here");
+                sock.emit("No User","Invalid Password and/or Username!");
 
-                if(rows.length == 0 && loginregex.test(pass) == true){
-                    var username = rows[0].username;
-                    var wins = rows[0].Wins;
-                    var loss = rows[0].Losses;
-                    console.log("nothing here, good to sign up");
-                    console.log(user);
-                    console.log(status);
-                    if(status == "win"){
-                        wins = wins + 1;
-                    }else{
-                        loss = loss + 1;
-                    }
-                    var post  = {Wins: db.escape(wins), Losses: db.escape(loss)};
-                    var sql2 = 'UPDATE accounts SET ? WHERE username = ' + db.escape(username);
-                    var query = db.query(sql2, post, function (error, results, fields) {
-                      if (error) throw error;
-                      // Neat!
-                    });
+                  //io.emit("logged_in", {user: user});
+                //});
+            }else{
+                console.log("here");
+                var found = true;
+            }
+            if(found && !(users.includes(user))){
+                const dataUser = rows[0].username;
+                const dataPass = rows[0].password;
+                const dataWin = rows[0].Wins;
+                const dataLoss = rows[0].Losses;
+                bcrypt.compare(pass, dataPass, function(err, res) {
+                  if (err){
+                    console.log(err);
+                  }
+                  if (res) {
 
-                    //db.query(sql, function(err, rows, fields){});
-                    console.log("Wins/loss changed!");
+                                    if(dataPass == null || dataUser == null){
+                                      sock.emit("No User", "Invalid Password and/or Username!");
+                                      console.log("Error");
+                                    }
+                                    if(user == dataUser && res == true){
+                                      sock.emit("No User", "Successful Sign In!");
+                                      req.session.userID = rows[0].id;
+                                      req.session.save();
+                                      req.session.save();
+                                      console.log("session id saved");
+                                      allGood = true;
+                                    }else{
+                                      sock.emit("No User", "Invalid Password and/or Username!");
+                                      console.log("invalid session");
+                                    }
+                  } else {
+                    // response is OutgoingMessage object that server response http request
+                    console.log("Invalid username, password");
+                    sock.emit("No User", "Invalid Password and/or Username!");
 
-                      //io.emit("logged_in", {user: user});
-                    //});
-                }else{
-                    console.log("failed update of wins/loss");
-                    var found = true;
+                  }
 
-                }
-        });
+                    if(allGood == true){
+                                      users.push(dataUser);
+                                      console.log(users);
+                                      usersocks.push(sock);
+                                      gameUsers.push(dataUser);
+                                      console.log(gameUsers);
+                                      //io.emit("unhide waiting", dataUser);
+                                      //sock.emit("unhidew", "unhide");
+                                      console.log(dataUser);
+
+                                      if (waitingPlayer) {
+
+                                          sock.emit("unhide");
+                                          new RpsGame(waitingPlayer, sock, db, gameUsers);
+                                          waitingPlayer = null;
+                                          gameUsers = [];
+                                        } else {
+                                          waitingPlayer = sock;
+                                          waitingPlayer.emit("unhide");
+                                          waitingPlayer.emit('message', 'Waiting for an opponent');
+                                      }
+
+
+                                  }
+
+                });
+
+
+
+            }
+            if(found && users.includes(user)){
+                console.log("This user is already logged in!");
+                sock.emit("No User", "Invalid Password and/or Username!");
+            }
+            });
+     }else{
+        console.log("invalid username");
+        sock.emit("No User", "Invalid Password and/or Username!");
+     }
+
   });
+
   sock.on('New', (text) =>{
     console.log('Hello new')
     user = text[0];
@@ -191,23 +174,31 @@ io.on('connection', (sock) => {
     var sql = "SELECT * FROM accounts WHERE username=" + db.escape(user);
     console.log(pass);
     console.log(loginregex.test(pass));
-    db.query(sql, function(err, rows, fields){
 
-            if(rows.length == 0 && loginregex.test(pass) == true){
+    db.query(sql, function(err, rows, fields){
+            if(rows.length == 0 && loginregex.test(pass) == true && loginregex.test(user) == true && user != pass){
                 console.log("nothing here, good to sign up");
                 console.log(user);
                 console.log(pass);
-                sql = "INSERT into accounts (username, password) VALUES (" + db.escape(user) + ", " + db.escape(pass) + ")";
-                var query = db.query(sql, function (error, results, fields) {
-                  if (error) throw error;
-                  // Neat!
+                bcrypt.hash(pass, salt, function(err, hash){
+                                if(err) console.log(err);
+                                pass = hash;
+                                console.log(pass); //shows hashed password
+                                sql = "INSERT into accounts (username, password) VALUES (" + db.escape(user) + ", " + db.escape(pass) + ")";
+
+                                var query = db.query(sql, function (error, results, fields) {
+                                                  if (error) throw error;
+                                                  // Neat!
+                                });
+
+                                                //db.query(sql, function(err, rows, fields){});
+                                                console.log("New Account!");
+                                                sock.emit("No User", "Successful Registration. Please sign in above");
+                                                  //io.emit("logged_in", {user: user});
+                                                //});
+                                //>>query logic should go here.
                 });
 
-                //db.query(sql, function(err, rows, fields){});
-                console.log("New Account!");
-                sock.emit("No User", "Successful Registration. Please sign in above");
-                  //io.emit("logged_in", {user: user});
-                //});
             }else{
                 sock.emit("No User", "Please use a novel username and a password that is at least 8 characters and no more than 32 characters.");
                 console.log("here");
