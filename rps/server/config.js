@@ -11,7 +11,7 @@ function randomString(size = 128) {
         .slice(0, size)
 }
 
-module.exports = {
+module.exports = { //Renaming of environment variables
     port: process.env.SERVER_PORT,
     host: process.env.DB_HOST,
     user: process.env.DB_USERNAME,
