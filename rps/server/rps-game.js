@@ -1,6 +1,7 @@
 class RpsGame {
-
+//constructor that manages a game between two players
   constructor(p1, p2, db, gameUsers) {
+  //Object parameters
     this.db = db;
     this.gameUsers = gameUsers;
     this.lostTurns1 = [];
@@ -36,18 +37,18 @@ class RpsGame {
 
     });
   }
-
+//sends a message to a particular player within the game.
   _sendToPlayer(playerIndex, msg) {
 
     this._players[playerIndex].emit('message', msg);
   }
-
+//sends a message to all players playing a particular game.
   _sendToPlayers(msg) {
     this._players.forEach((player) => {
       player.emit('message', msg);
     });
   }
-
+//show the statistics of all players in the game.
   _sendPlayerStats() {
       var i = 0;
       var messages = [];
@@ -68,13 +69,14 @@ class RpsGame {
       this._sendToPlayers(messages[0]);
       this._sendToPlayers(messages[1]);
   }
-
+//function that checks if a game or a round within a game is over, and if so shows who one the round and game if applicable.
   _onTurn(playerIndex, turn) {
     this._turns[playerIndex] = turn;
     this._sendToPlayer(playerIndex, `You selected ${turn}`);
     var n = this._checkGameOver();
     this._sendToPlayers(n);
   }
+//Updates the win/loss record
   _update_wl(text){
       console.log('Hello new')
       var status = text[0];
@@ -101,6 +103,7 @@ class RpsGame {
           }
       });
     }
+//Checks if the round is over and sees if the entire game is over.
   _checkGameOver() {
     const turns = this._turns;
     var y = "No";
@@ -174,7 +177,7 @@ class RpsGame {
     }
     return y;
   }
-
+//Calculates the game result
   _getGameResult() {
 
     const p0 = this._decodeTurn(this._turns[0], "1");
@@ -219,7 +222,7 @@ class RpsGame {
     }
     return message;
   }
-
+//Sends the outcome message to each player.
   _sendWinMessage(winner, loser, losing_turn, wl) {
     winner.emit('message', 'You won!');
     winner.emit('outcome', 'You da best!');
@@ -229,7 +232,7 @@ class RpsGame {
     loser.emit('loser', losing_turn);
     this._sendToPlayers(wl);
   }
-
+//decodes the turn sent by the client
   _decodeTurn(turn, player) {
     if(player == "1" && this.lostTurns1.includes(turn)){
         throw new Error(`This value has already been lost by the player`);

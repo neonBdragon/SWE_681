@@ -9,25 +9,28 @@ const fs = require('fs');
 const https = require("https");
 const bcrypt = require("bcrypt");
 const config = require('./config.js');
+const env = require('dotenv').config();
+console.log(config);
 const salt = 10;
-
+//express app declaration
 const app = express();
 
 const clientPath = `${__dirname}/../client`;
 console.log(`Serving static from ${clientPath}`);
 
 app.use(express.static(clientPath));
-
+//indicates the secret key and cert to use for the session; self signed certificate.
 const options = {
     key: fs.readFileSync('../../ssl/server.key'),
     cert: fs.readFileSync('../../ssl/server.crt')
 };
 
+//creates an https server with the self signed certificate and key
 //const server = http.createServer(options, app); //This server declaration caused issues for reasons I don't understand
-const server = https.createServer(options, app).listen(config.port, function () {
-    console.log('RPS started on 8080! Go to https://localhost:8080')
+const server = https.createServer(options, app).listen(process.env.SERVER_PORT, function () {
+    console.log('RPS started on 443! Go to https://localhost:443')
 });
-
+//creates socketio connection that a client can connect to.
 const io = socketio(server);
 const sessionMiddleware = session({
   secret: config.secret
@@ -43,8 +46,9 @@ const config = {
   "password": 'Lina&$thatsmyhoney2019',
   "base": 'login_info'
 };
- */
+*/
 
+/*
 var db = mysql.createConnection({
   host: config.host,
   user: config.user,
@@ -52,12 +56,22 @@ var db = mysql.createConnection({
   database: config.base
 });
 
+*/
+//Database used by the server with credentials passed in from a decrypted shell/bash script
+var db = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
+});
+//Initiating a database connection
 db.connect(function (error){
     if(!!error){
         throw error;
     }
     console.log('mysql connected');
 });
+//Variables and regex function used for handling events during a connection.
 let waitingPlayer = null;
 app.use(express.static('./'));
 var users = [];
@@ -65,6 +79,7 @@ var usersocks = [];
 const loginregex = new RegExp("^([A-Za-z0-9]{8,32})$");
 var gameUsers = [];
 var messages = [];
+//Handling client connections and events.
 io.on('connection', (sock) => {
   var req = sock.request;
   if(req.session.userID != null){
@@ -75,7 +90,7 @@ io.on('connection', (sock) => {
         io.emit("logged_in", {user: rows[0].Username});
       });
     }
-
+//login verification
   sock.on("log", (data) => {
 
     var allGood = false;
@@ -171,7 +186,7 @@ io.on('connection', (sock) => {
      }
 
   });
-
+//creating a new account
   sock.on('New', (text) =>{
     console.log('Hello new')
     user = text[0];
@@ -212,6 +227,7 @@ io.on('connection', (sock) => {
             }
     });
   });
+//listening for message event and passing it to the appropriate socket.
   sock.on('message', (text) => {
     if(text.includes("Bet ")){
         var a = text.split(" ");
@@ -221,15 +237,19 @@ io.on('connection', (sock) => {
     }
     io.emit('message', text);
   });
+  //sending an outcome message
   sock.on('outcome', (text) => {
     io.emit('outcome', text);
   });
+  //sending message to a losing player
   sock.on('loser', (text) => {
       io.emit('loser', text);
   });
+  //Reseting game
   sock.on('reset', (text) => {
         io.emit('reset', text);
   });
+  //Removing a user
   sock.on('remove user', (text) => {
            console.log("Before");
            console.log(usersocks.length);
