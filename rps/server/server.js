@@ -8,7 +8,9 @@ const session = require('express-session');
 const fs = require('fs');
 const https = require("https");
 const bcrypt = require("bcrypt");
+const config = require('./config.js');
 const salt = 10;
+
 const app = express();
 
 const clientPath = `${__dirname}/../client`;
@@ -22,28 +24,31 @@ const options = {
 };
 
 //const server = http.createServer(options, app); //This server declaration caused issues for reasons I don't understand
-const server = https.createServer(options, app).listen(8080, function () {
+const server = https.createServer(options, app).listen(config.port, function () {
     console.log('RPS started on 8080! Go to https://localhost:8080')
 });
 
 const io = socketio(server);
 const sessionMiddleware = session({
-  secret: "keyboard cat"
+  secret: config.secret
 });
 io.use(function (sock, next){
     sessionMiddleware(sock.request, sock.request.res, next);
 });
+
+/*
 const config = {
   "host": "localhost",
   "user": "root",
   "password": 'Lina&$thatsmyhoney2019',
   "base": 'login_info'
 };
+ */
 
 var db = mysql.createConnection({
   host: config.host,
   user: config.user,
-  password: config.password,
+  password: config.pass,
   database: config.base
 });
 
