@@ -39,24 +39,7 @@ io.use(function (sock, next){
     sessionMiddleware(sock.request, sock.request.res, next);
 });
 
-/*
-const config = {
-  "host": "localhost",
-  "user": "root",
-  "password": 'Lina&$thatsmyhoney2019',
-  "base": 'login_info'
-};
-*/
 
-/*
-var db = mysql.createConnection({
-  host: config.host,
-  user: config.user,
-  password: config.pass,
-  database: config.base
-});
-
-*/
 //Database used by the server with credentials passed in from a decrypted shell/bash script
 var db = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -229,10 +212,10 @@ io.on('connection', (sock) => {
   });
 //listening for message event and passing it to the appropriate socket.
   sock.on('message', (text) => {
-    if(text.includes("Bet ")){
-        var a = text.split(" ");
+    if(text.includes("Bet-")){
+        var a = text.split("-");
         var b = parseFloat(a[1]);
-        sock.emit('Bet', b);
+        io.emit('Bet', b);
         io.emit('message', 'bet is in! ' + b);
     }
     io.emit('message', text);

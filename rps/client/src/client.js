@@ -108,6 +108,11 @@ const onFormSubmitted = (e) => {
   input.value = '';
 
   sock.emit('message', username + ": " + text);
+  if(text.includes("Bet-")){
+    var a = text.split("-");
+    var b = parseFloat(a[1]);
+    sock.emit("Bet", b);
+  }
 };
 
 const addButtonListeners = () => {
@@ -126,6 +131,7 @@ const addButtonListeners2 = () => {
         button.addEventListener('click', () => {
             if(id === 'Leave'){
                 sock.emit("remove user", username);
+                sock.emit("Leaving Game", username);
                 location.reload();
             }else if(id === 'Login_Register'){
                 var user = document.getElementById("userName").value;

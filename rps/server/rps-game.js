@@ -24,7 +24,8 @@ class RpsGame {
     this._sendToPlayer(0, "You are Player 1");
     this._sendToPlayer(1, "You are Player 2");
     this._sendPlayerStats();
-    this._sendToPlayers('If you want to bet, please type Bet <the value with no $>.');
+    this._sendToPlayers('If you want to bet, please type:');
+    this._sendToPlayers('Bet-<the value with no $ or spaces>.')
     this._sendToPlayers('Value for the game: ' + this.val);
     this._players.forEach((player, idx) => {
       player.on('turn', (turn) => {
@@ -32,6 +33,10 @@ class RpsGame {
       });
       player.on('Bet', (bet) =>{
         this.moneypool = this.moneypool + bet;
+        this._sendToPlayers('$'+ bet + ' more Dollars is up for the taking!');
+      });
+      player.on('Leaving Game', (player) => {
+        this._sendToPlayers('Player ' + player + ' is exiting this game, please press Leave and sign in to try and play again with another player.');
       });
 
 
@@ -74,7 +79,7 @@ class RpsGame {
     this._turns[playerIndex] = turn;
     this._sendToPlayer(playerIndex, `You selected ${turn}`);
     var n = this._checkGameOver();
-    this._sendToPlayers(n);
+    //this._sendToPlayers(n);
   }
 //Updates the win/loss record
   _update_wl(text){
@@ -188,20 +193,20 @@ class RpsGame {
     var outcome2 = -1;
     switch(this.operator){
         case '*':
-            outcome1 = p0 * this.val;
-            outcome2 = p1 * this.val;
+            outcome1 = this.val * p0;
+            outcome2 = this.val * p1;
             break;
         case '/':
-            outcome1 = p0 / this.val;
-            outcome2 = p1 / this.val;
+            outcome1 = this.val / p0;
+            outcome2 = this.val / p1;
             break;
         case '+':
-            outcome1 = p0 + this.val;
-            outcome2 = p1 + this.val;
+            outcome1 = this.val + p0;
+            outcome2 = this.val + p1;
             break;
         case '-':
-            outcome1 = p0 - this.val;
-            outcome2 = p1 - this.val;
+            outcome1 = this.val - p0;
+            outcome2 = this.val - p1;
             break;
 
     }
