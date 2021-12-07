@@ -59,7 +59,8 @@ let waitingPlayer = null;
 app.use(express.static('./'));
 var users = [];
 var usersocks = [];
-const loginregex = new RegExp("^([A-Za-z0-9]{8,32})$");
+const loginregex = new RegExp("^([A-Za-z0-9_@./#&+-]{8,32})$");
+const userReg = new RegExp("^([A-Za-z0-9]{8,32})$")
 var gameUsers = [];
 var messages = [];
 //Handling client connections and events.
@@ -82,7 +83,7 @@ io.on('connection', (sock) => {
     user = data[0];
     pass = data[1];
     var sql = "SELECT * FROM accounts WHERE username=" + db.escape(user);
-    if(loginregex.test(pass) == true && loginregex.test(user) == true && user != pass){
+    if(loginregex.test(pass) == true && userReg.test(user) == true && user != pass){
 
         db.query(sql, function(err, rows, fields){
             if(rows.length == 0){
@@ -179,7 +180,7 @@ io.on('connection', (sock) => {
     console.log(loginregex.test(pass));
 
     db.query(sql, function(err, rows, fields){
-            if(rows.length == 0 && loginregex.test(pass) == true && loginregex.test(user) == true && user != pass){
+            if(rows.length == 0 && loginregex.test(pass) == true && userReg.test(user) == true && user != pass){
                 console.log("nothing here, good to sign up");
                 console.log(user);
                 console.log(pass);
