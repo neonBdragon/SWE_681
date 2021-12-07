@@ -25,7 +25,7 @@ class RpsGame {
     this._sendToPlayer(1, "You are Player 2");
     this._sendPlayerStats();
     this._sendToPlayers('If you want to bet, please type:');
-    this._sendToPlayers('Bet-<the value with no $ or spaces>.')
+    this._sendToPlayers('Bet-<the value with no $ or spaces>.');
     this._sendToPlayers('Value for the game: ' + this.val);
     this._players.forEach((player, idx) => {
       player.on('turn', (turn) => {
