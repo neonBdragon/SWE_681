@@ -1,4 +1,3 @@
-const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const mysql = require('mysql');
@@ -11,11 +10,13 @@ const bcrypt = require("bcrypt");
 const config = require('./config.js');
 const env = require('dotenv').config();
 const helmet = require("helmet");
+const nocache = require("nocache");
 console.log(config);
 const salt = 10;
 //express app declaration
-const app = express();
-const Crypto = require('crypto')
+const app = express()
+
+const Crypto = require('crypto');
 function genuuid(size = 128) {
     return Crypto
         .randomBytes(size)
@@ -27,31 +28,27 @@ function genuuid(size = 128) {
 const clientPath = `${__dirname}/../client`;
 console.log(`Serving static from ${clientPath}`);
 
+// Security Headers
+app.use(
+    nocache(), // Cache control
+    cookieParser(), // CSRF
+    helmet(),
+    helmet.contentSecurityPolicy({
+        useDefaults: true,
+        directives: {
+            "script-src": ["'self'"],
+            "style-src": null,
+        },
+    }),
+    helmet.frameguard({
+        action: "deny",
+    }),
+    helmet.permittedCrossDomainPolicies({
+        permittedPolicies: "none",
+    })
+);
+
 app.use(express.static(clientPath));
-
-// CSRF
-app.use(cookieParser());
-
-// CSP Header
-app.use(function (req, res, next) {
-    res.setHeader(
-        'Content-Security-Policy-Report-Only',
-        "default-src 'self'; font-src 'self'; img-src 'self'; script-src 'self'; style-src 'self' styles/main.css; frame-src 'self'"
-    );
-    next();
-});
-
-// Cross-Domain Configuration
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', 'https://localhost');
-    res.setHeader('Access-Control-Allow-Methods', 'POST');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    next();
-});
-
-app.disable('x-powered-by')
-app.use(helmet());
 
 //indicates the secret key and cert to use for the session; self signed certificate.
 const options = {
@@ -83,7 +80,6 @@ const sessionMiddleware = session({
 io.use(function (sock, next) {
     sessionMiddleware(sock.request, sock.request.res, next);
 });
-
 
 //Database used by the server with credentials passed in from a decrypted shell/bash script
 var db = mysql.createConnection({
