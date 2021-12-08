@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "helmet": "^4.6.0",
     "socketio": "^1.0.0"
   }
 }
