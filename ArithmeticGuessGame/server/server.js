@@ -13,6 +13,8 @@ const helmet = require("helmet");
 const nocache = require("nocache");
 console.log(config);
 const salt = 10;
+const { createLogger, format, transports } = require('winston');
+const { combine, timestamp, prettyPrint } = format;
 //express app declaration
 const app = express();
 
@@ -25,8 +27,39 @@ function genuuid(size = 128) {
         .replace(/\+/g,'-') //Replaces + with -
         .slice(0, size)
 }
+
+// Logging
+
+
+const logger = createLogger({
+    level: 'info',
+    format: combine(
+        timestamp(),
+        prettyPrint()
+    ),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        //
+        // - Write all logs with level `error` and below to `error.log`
+        // - Write all logs with level `info` and below to `combined.log`
+        //
+        new transports.File({ filename: 'logs/error.log', level: 'error' }),
+        new transports.File({ filename: 'logs/combined.log' }),
+    ],
+});
+
+//
+// If we're not in production then log to the `console` with the format:
+// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+//
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new transports.Console({
+        format: prettyPrint(),
+    }));
+}
+
 const clientPath = `${__dirname}/../client`;
-console.log(`Serving static from ${clientPath}`);
+logger.info(`Serving static from ${clientPath}`);
 
 // Security Headers
 app.use(
@@ -59,7 +92,7 @@ const options = {
 //creates an https server with the self signed certificate and key
 //const server = http.createServer(options, app); //This server declaration caused issues for reasons I don't understand
 const server = https.createServer(options, app).listen(process.env.SERVER_PORT, function () {
-    console.log('Arithmetic Game started on 443! Go to https://localhost:443')
+    logger.info('Arithmetic Game started on 443! Go to https://localhost:443')
 });
 //creates socketio connection that a client can connect to.
 const io = socketio(server);
@@ -93,7 +126,7 @@ db.connect(function (error) {
     if (!!error) {
         throw error;
     }
-    console.log('mysql connected');
+    logger.info('mysql connected');
 });
 //Variables and regex function used for handling events during a connection.
 let waitingPlayer = null;
@@ -149,13 +182,13 @@ io.on('connection', (sock) => {
                     const dataLoss = rows[0].Losses;
                     bcrypt.compare(pass, dataPass, function (err, res) {
                         if (err) {
-                            console.log(err);
+                            logger.error(err);
                         }
                         if (res) {
 
                             if (dataPass == null || dataUser == null) {
                                 sock.emit("No User", "Invalid Password and/or Username!");
-                                console.log("Error");
+                                logger.info("Error");
                             }
                             if (user == dataUser && res == true) {
                                 sock.emit("No User", "Successful Sign In!");
@@ -166,11 +199,11 @@ io.on('connection', (sock) => {
                                 allGood = true;
                             } else {
                                 sock.emit("No User", "Invalid Password and/or Username!");
-                                console.log("invalid session");
+                                logger.info("invalid session");
                             }
                         } else {
                             // response is OutgoingMessage object that server response http request
-                            console.log("Invalid username, password");
+                            logger.info("Invalid username, password");
                             sock.emit("No User", "Invalid Password and/or Username!");
 
                         }
@@ -210,12 +243,12 @@ io.on('connection', (sock) => {
 
                 }
                 if (found && users.includes(user)) {
-                    console.log("This user is already logged in!");
+                    logger.info("This user is already logged in!");
                     sock.emit("No User", "Invalid Password and/or Username!");
                 }
             });
         } else {
-            console.log("invalid username");
+            logger.info("invalid username");
             sock.emit("No User", "Invalid Password and/or Username!");
         }
 
@@ -243,7 +276,7 @@ io.on('connection', (sock) => {
                     });
 
                     //db.query(sql, function(err, rows, fields){});
-                    console.log("New Account!");
+                    logger.info("New Account!");
                     sock.emit("No User", "Successful Registration. Please sign in above");
                     //io.emit("logged_in", {user: user});
                     //});
@@ -288,7 +321,7 @@ io.on('connection', (sock) => {
             chatsocks[index][0].emit('message', text);
             chatsocks[index][1].emit('message', text);
         } else {
-            console.log("User not in system and/or not in same game");
+            logger.info("User not in system and/or not in same game");
         }
     });
     //sending an outcome message
@@ -350,7 +383,7 @@ io.on('connection', (sock) => {
 });
 
 server.on('error', (err) => {
-    console.error('Server error:', err);
+    logger.error('Server error:', err);
 });
 
 /*server.listen(8080, () => {
