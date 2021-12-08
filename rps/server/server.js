@@ -110,6 +110,7 @@ var messages = [];
 //Handling client connections and events.
 io.on('connection', (sock) => {
     var req = sock.request;
+    /*
     if (req.session.userID != null) {
         var userId = req.session.userID;
         var sql = "SELECT * FROM accounts WHERE id=" + db.escape(userID);
@@ -117,7 +118,7 @@ io.on('connection', (sock) => {
             if (error) throw error;
             io.emit("logged_in", {user: rows[0].Username});
         });
-    }
+    }*/
 //login verification
     sock.on("log", (data) => {
 

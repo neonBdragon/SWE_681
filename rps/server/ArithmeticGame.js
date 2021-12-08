@@ -45,7 +45,7 @@ class ArithmeticGame {
       player.on('Pause', (message) => {
 
         var timer1 = null;
-        if(this.pauseCount[idx] < 1){
+        if(this.pauseCount[idx] < 1 && this.pause != true){
             this._sendToPlayers("The game has been paused by " + message);
             this.pauseCount[idx] = this.pauseCount[idx] + 1;
             this.pause = true;
@@ -54,6 +54,8 @@ class ArithmeticGame {
                 this.bootPlayer = idx;
                 this._boot();
             }, 30000);
+        }else if(this.pauseCount[idx] < 1 && this.pause === true){
+            this._sendToPlayers("The game is already paused.");
         }else{
             clearTimeout(this.timeout);
             this.timeout = null;
