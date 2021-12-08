@@ -83,10 +83,10 @@ const loser = (text) => {
 };
 
 const reset = (text) => {
-    rem = document.getElementById("Leave");
+    rem = document.getElementById("Pause");
     array.push(rem);
     rem.parentNode.removeChild(rem);
-    rem = document.getElementById("Pause");
+    rem = document.getElementById("Leave");
     array.push(rem);
     rem.parentNode.removeChild(rem);
     const parent = document.querySelector('#buttons');
