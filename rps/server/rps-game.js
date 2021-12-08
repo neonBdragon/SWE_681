@@ -20,6 +20,7 @@ class RpsGame {
     this.count1 = 7;
     this.count2 = 7;
     this.moneypool = 0.00;
+    this.timeout = null;
     this._sendToPlayers('Arithematic Guess Game Starts!');
     this._sendToPlayer(0, "You are Player 1");
     this._sendToPlayer(1, "You are Player 2");
@@ -48,13 +49,14 @@ class RpsGame {
             this._sendToPlayers("The game has been paused by " + message);
             this.pauseCount[idx] = this.pauseCount[idx] + 1;
             this.pause = true;
-            timer1 = setTimeout(() => {
+            this.timeout = setTimeout(() => {
                 this.boot = true;
                 this.bootPlayer = idx;
                 this._boot();
             }, 30000);
         }else{
-            clearTimeout(timer1);
+            clearTimeout(this.timeout);
+            this.timeout = null;
             this.pause = false;
             this._sendToPlayers("The game has been resumed by " + message);
             this.pauseCount[idx] = 0;
