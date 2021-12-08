@@ -86,6 +86,9 @@ const reset = (text) => {
     rem = document.getElementById("Leave");
     array.push(rem);
     rem.parentNode.removeChild(rem);
+    rem = document.getElementById("Pause");
+    array.push(rem);
+    rem.parentNode.removeChild(rem);
     const parent = document.querySelector('#buttons');
 
       // <li> element

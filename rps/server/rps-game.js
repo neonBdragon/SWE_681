@@ -61,7 +61,15 @@ class RpsGame {
         }
       });
       player.on('Leaving Game', (player) => {
-        this._sendToPlayers('Player ' + player + ' is exiting this game, please press Leave and sign in to try and play again with another player.');
+        this._sendToPlayers('Player ' + player + ' is exiting this game, please press Leave and sign in to try and play again with another player. Otherwise, you will be booted automatically in 15 seconds.');
+        var timer2 = null;
+        if(idx === 0){
+            timer2 = setTimeout(() => {this._bootSingle(this._players[1]);}, 15000);
+        }
+        if(idx === 1){
+            timer2 = setTimeout(() => {this._bootSingle(this._players[0]);}, 15000);
+        }
+
       });
 
 
@@ -99,6 +107,9 @@ class RpsGame {
       this._players.forEach((player) => {
         player.emit('Booted', 'Boot');
       });
+  }
+  _bootSingle(player){
+    player.emit('Booted', 'Boot');
   }
 //show the statistics of all players in the game.
   _sendPlayerStats() {

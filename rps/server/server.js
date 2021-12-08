@@ -56,6 +56,9 @@ db.connect(function (error){
 });
 //Variables and regex function used for handling events during a connection.
 let waitingPlayer = null;
+let waitingUser = null;
+var chats = [];
+var chatsocks = [];
 app.use(express.static('./'));
 var users = [];
 var usersocks = [];
@@ -131,9 +134,9 @@ io.on('connection', (sock) => {
 
                     if(allGood == true){
                                       users.push(dataUser);
-
                                       usersocks.push(sock);
                                       gameUsers.push(dataUser);
+                                      console.log(users);
 
                                       //io.emit("unhide waiting", dataUser);
                                       //sock.emit("unhidew", "unhide");
@@ -142,11 +145,16 @@ io.on('connection', (sock) => {
                                       if (waitingPlayer) {
 
                                           sock.emit("unhide");
+                                          chats.push([waitingUser, dataUser]);
+                                          console.log(chats);
+                                          chatsocks.push([waitingPlayer, sock]);
                                           new RpsGame(waitingPlayer, sock, db, gameUsers);
                                           waitingPlayer = null;
+                                          waitingUser = null;
                                           gameUsers = [];
                                         } else {
                                           waitingPlayer = sock;
+                                          waitingUser = dataUser;
                                           waitingPlayer.emit("unhide");
                                           waitingPlayer.emit('message', 'Waiting for an opponent');
                                       }
@@ -202,7 +210,7 @@ io.on('connection', (sock) => {
 
             }else{
                 sock.emit("No User", "Please use a novel username and a password that is at least 8 characters and no more than 32 characters.");
-                
+
                 var found = true;
 
             }
@@ -212,16 +220,33 @@ io.on('connection', (sock) => {
   sock.on('message', (text) => {
     var x = text.split(":");
     var u = x[0];
-    if(users.includes(u)){
+    var i = null;
+    var index = null;
+    console.log(u);
+    for(i = 0; i < chats.length; i++){
+                if(chats[i][0] === u || chats[i][1] === u){
+                    index = i;
+                }
+    }
+    //chats.some(row => row.includes(u))
+    if(index != null){
+
+        console.log(index);
         if(text.includes("Bet-")){
             var a = text.split("-");
             var b = parseFloat(a[1]);
-            io.emit('Bet', b);
-            io.emit('message', 'bet is in! ' + b);
+            chatsocks[index][0].emit('Bet', b);
+            chatsocks[index][1].emit('Bet', b);
+            chatsocks[index][0].emit('message','bet is in! ' + b);
+            chatsocks[index][1].emit('message','bet is in! ' + b);
+            //io.emit('Bet', b);
+            //io.emit('message', 'bet is in! ' + b);
         }
-        io.emit('message', text);
+        //io.emit('message', text);
+        chatsocks[index][0].emit('message', text);
+        chatsocks[index][1].emit('message', text);
     }else{
-        console.log("User not in system");
+        console.log("User not in system and/or not in same game");
     }
   });
   //sending an outcome message
@@ -240,14 +265,38 @@ io.on('connection', (sock) => {
   sock.on('remove user', (text) => {
 
            index = -1;
+           index2 = -1;
            for(i = 0; i < users.length; i++){
                       console.log(users[i]);
-                      if(users[i] = text){
+                      if(users[i] === text){
                         index = i;
                       }
            }
-          users = users.filter(e => e !== text);
-          usersocks = usersocks.filter(e => e !== usersocks[index]);
+           for(i = 0; i < chats.length; i++){
+                console.log(chats[i]);
+                if(chats[i][0] === text || chats[i][1] === text){
+                    index2 = i;
+                }
+           }
+           console.log(index);
+           console.log(index2);
+           console.log(chats);
+           //console.log(chatsocks);
+           console.log(users);
+           //console.log(usersocks);
+           if(index != -1 && index2 != -1){
+               chats.splice(index2, 1);
+               chatsocks.splice(index2, 1);
+               users.splice(index, 1);
+               usersocks.splice(index, 1);
+           }
+
+          //users = users.filter(e => e !== text);
+          //usersocks = usersocks.filter(e => e !== usersocks[index]);
+          console.log(chats);
+          //console.log(chatsocks);
+          console.log(users);
+          //console.log(usersocks);
 
 
 
