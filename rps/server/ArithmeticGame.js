@@ -1,4 +1,4 @@
-class RpsGame {
+class ArithmeticGame {
 //constructor that manages a game between two players
   constructor(p1, p2, db, gameUsers) {
   //Object parameters
@@ -335,5 +335,5 @@ class RpsGame {
 
 }
 
-module.exports = RpsGame;
+module.exports = ArithmeticGame;
 
