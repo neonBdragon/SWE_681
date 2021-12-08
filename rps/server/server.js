@@ -131,13 +131,13 @@ io.on('connection', (sock) => {
 
                     if(allGood == true){
                                       users.push(dataUser);
-                                      console.log(users);
+
                                       usersocks.push(sock);
                                       gameUsers.push(dataUser);
-                                      console.log(gameUsers);
+
                                       //io.emit("unhide waiting", dataUser);
                                       //sock.emit("unhidew", "unhide");
-                                      console.log(dataUser);
+
 
                                       if (waitingPlayer) {
 
@@ -176,18 +176,15 @@ io.on('connection', (sock) => {
     user = text[0];
     pass = text[1];
     var sql = "SELECT * FROM accounts WHERE username=" + db.escape(user);
-    console.log(pass);
-    console.log(loginregex.test(pass));
 
     db.query(sql, function(err, rows, fields){
             if(rows.length == 0 && loginregex.test(pass) == true && userReg.test(user) == true && user != pass){
                 console.log("nothing here, good to sign up");
-                console.log(user);
-                console.log(pass);
+
                 bcrypt.hash(pass, salt, function(err, hash){
                                 if(err) console.log(err);
                                 pass = hash;
-                                console.log(pass); //shows hashed password
+                                //shows hashed password
                                 sql = "INSERT into accounts (username, password) VALUES (" + db.escape(user) + ", " + db.escape(pass) + ")";
 
                                 var query = db.query(sql, function (error, results, fields) {
@@ -205,7 +202,7 @@ io.on('connection', (sock) => {
 
             }else{
                 sock.emit("No User", "Please use a novel username and a password that is at least 8 characters and no more than 32 characters.");
-                console.log("here");
+                
                 var found = true;
 
             }
@@ -241,8 +238,7 @@ io.on('connection', (sock) => {
   });
   //Removing a user
   sock.on('remove user', (text) => {
-           console.log("Before");
-           console.log(usersocks.length);
+
            index = -1;
            for(i = 0; i < users.length; i++){
                       console.log(users[i]);
@@ -253,11 +249,8 @@ io.on('connection', (sock) => {
           users = users.filter(e => e !== text);
           usersocks = usersocks.filter(e => e !== usersocks[index]);
 
-          console.log("After");
-          console.log(usersocks.length);
-          for(i = 0; i < users.length; i++){
-            console.log(users[i]);
-          }
+
+
   });
 
 
