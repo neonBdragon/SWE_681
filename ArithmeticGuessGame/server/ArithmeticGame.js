@@ -2,13 +2,27 @@ class ArithmeticGame {
 //constructor that manages a game between two players
   constructor(p1, p2, db, gameUsers) {
   //Object parameters
+    if(db === null){
+        console.log("Null database present")
+        throw new Error(`Users cannot be empty`);
+    }
     this.db = db;
+    if(gameUsers === null){
+        console.log("Null usernames present")
+        throw new Error(`Users cannot be empty`);
+    }
     this.gameUsers = gameUsers;
     this.lostTurns1 = [];
     this.lostTurns2 = [];
     this.playerTurns1 = [];
     this.playerTurns2 = [];
-    this._players = [p1, p2];
+    if(p1 != null && p2 != null){
+        this._players = [p1, p2];
+        console.log("No null players");
+    }else{
+        console.log("null players present");
+        throw new Error(`No players can be empty`);
+    }
     this._player1money = 0.00;
     this._player2money = 0.00;
     this._turns = [null, null];
@@ -138,13 +152,17 @@ class ArithmeticGame {
   }
 //function that checks if a game or a round within a game is over, and if so shows who one the round and game if applicable.
   _onTurn(playerIndex, turn) {
-    if(this.pause === false){
+    if(this.pause === false && this.boot === false){
         this._turns[playerIndex] = turn;
         this._sendToPlayer(playerIndex, `You selected ${turn}`);
         var n = this._checkGameOver();
     //this._sendToPlayers(n);
     }else{
-        this._sendToPlayers("The game is still paused!")
+        if(this.boot === true){
+            this._sendToPlayers("The game has been ended!!! A player was booted!!!")
+        }else{
+            this._sendToPlayers("The game is still paused!");
+        }
     }
   }
 //Updates the win/loss record

@@ -14,7 +14,7 @@ const nocache = require("nocache");
 console.log(config);
 const salt = 10;
 //express app declaration
-const app = express()
+const app = express();
 
 const Crypto = require('crypto');
 function genuuid(size = 128) {
@@ -107,6 +107,7 @@ const loginregex = new RegExp("^([A-Za-z0-9_@./#&+-]{8,32})$");
 const userReg = new RegExp("^([A-Za-z0-9])+$")
 var gameUsers = [];
 var messages = [];
+var approvedemitters = [];
 //Handling client connections and events.
 io.on('connection', (sock) => {
     var req = sock.request;
