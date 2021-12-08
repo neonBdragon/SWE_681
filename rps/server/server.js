@@ -60,7 +60,7 @@ app.use(express.static('./'));
 var users = [];
 var usersocks = [];
 const loginregex = new RegExp("^([A-Za-z0-9_@./#&+-]{8,32})$");
-const userReg = new RegExp("^([A-Za-z0-9]{8,32})$")
+const userReg = new RegExp("^([A-Za-z0-9])+$")
 var gameUsers = [];
 var messages = [];
 //Handling client connections and events.
@@ -213,13 +213,19 @@ io.on('connection', (sock) => {
   });
 //listening for message event and passing it to the appropriate socket.
   sock.on('message', (text) => {
-    if(text.includes("Bet-")){
-        var a = text.split("-");
-        var b = parseFloat(a[1]);
-        io.emit('Bet', b);
-        io.emit('message', 'bet is in! ' + b);
+    var x = text.split(":");
+    var u = x[0];
+    if(users.includes(u)){
+        if(text.includes("Bet-")){
+            var a = text.split("-");
+            var b = parseFloat(a[1]);
+            io.emit('Bet', b);
+            io.emit('message', 'bet is in! ' + b);
+        }
+        io.emit('message', text);
+    }else{
+        console.log("User not in system");
     }
-    io.emit('message', text);
   });
   //sending an outcome message
   sock.on('outcome', (text) => {

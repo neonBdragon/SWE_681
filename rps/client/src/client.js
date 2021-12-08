@@ -125,7 +125,7 @@ const addButtonListeners = () => {
   });
 };
 const addButtonListeners2 = () => {
-  ['Login_Register', 'Leave', 'yes', 'no', 'Login_RegisterNew'].forEach((id) => {
+  ['Login_Register', 'Leave', 'yes', 'no', 'Login_RegisterNew', 'Pause'].forEach((id) => {
     const button = document.getElementById(id);
     try {
         button.addEventListener('click', () => {
@@ -148,12 +148,8 @@ const addButtonListeners2 = () => {
                 document.getElementById("userNameNew").value = "";
                 var pass = document.getElementById("PasswordNew").value = "";
             }else{
-                if(id === 'yes'){
-                    sock.emit("response", "yes");
-                    yesno.style.visibility = "hidden";
-                }else{
-                    sock.emit("response", "no");
-                    yesno.style.visibility = "hidden";
+                if(id === 'Pause'){
+                    sock.emit("Pause", username);
                 }
             }
         });
@@ -174,6 +170,11 @@ const unhidew = (e) => {
     wait.style.visibility = "visible";
 
 };
+const boot = (e) => {
+    sock.emit("remove user", username);
+    sock.emit("Leaving Game", username);
+    location.reload();
+};
 var username = "";
 var playwith = "";
 
@@ -182,6 +183,7 @@ const login = document.getElementById("divlog");
 const signup = document.getElementById("divlog2");
 game.style.visibility = "hidden";
 const sock = io.connect();
+sock.on('Booted', boot);
 sock.on('play', play);
 sock.on('message', writeEvent);
 sock.on('outcome', displayWinner);

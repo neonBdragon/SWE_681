@@ -27,6 +27,12 @@ class RpsGame {
     this._sendToPlayers('If you want to bet, please type:');
     this._sendToPlayers('Bet-<the value with no $ or spaces>.');
     this._sendToPlayers('Value for the game: ' + this.val);
+    this.pauseCount = [0, 0];
+    this.bootPlayer = -1;
+    this.gameCurrentlyBeingPlayed = false;
+    this.boot = false;
+    this.pause = false;
+    this.gamePlay = true;
     this._players.forEach((player, idx) => {
       player.on('turn', (turn) => {
         this._onTurn(idx, turn);
@@ -34,6 +40,25 @@ class RpsGame {
       player.on('Bet', (bet) =>{
         this.moneypool = this.moneypool + bet;
         this._sendToPlayers('$'+ bet + ' more Dollars is up for the taking!');
+      });
+      player.on('Pause', (message) => {
+
+        var timer1 = null;
+        if(this.pauseCount[idx] < 1){
+            this._sendToPlayers("The game has been paused by " + message);
+            this.pauseCount[idx] = this.pauseCount[idx] + 1;
+            this.pause = true;
+            timer1 = setTimeout(() => {
+                this.boot = true;
+                this.bootPlayer = idx;
+                this._boot();
+            }, 30000);
+        }else{
+            clearTimeout(timer1);
+            this.pause = false;
+            this._sendToPlayers("The game has been resumed by " + message);
+            this.pauseCount[idx] = 0;
+        }
       });
       player.on('Leaving Game', (player) => {
         this._sendToPlayers('Player ' + player + ' is exiting this game, please press Leave and sign in to try and play again with another player.');
@@ -52,6 +77,28 @@ class RpsGame {
     this._players.forEach((player) => {
       player.emit('message', msg);
     });
+  }
+  _boot() {
+              if(this.boot === true){
+                  if(this.bootPlayer === 1){
+                      this._update_wl(["loss", this.gameUsers[0]]);
+                      this._update_wl(["win", this.gameUsers[1]]);
+                      this._sendToPlayers('Player 2 Wins!');
+                      this._player2money = this._player2money + this.moneypool;
+                      this._sendToPlayers('Player 2 has won: $' + this.moneypool);
+                  }else{
+                         this._update_wl(["win", this.gameUsers[0]]);
+                         this._update_wl(["loss", this.gameUsers[1]]);
+                         this._sendToPlayers('Player 1 Wins!');
+                         this._player1money = this._player1money + this.moneypool;
+                         this._sendToPlayers('Player 1 has won: $' + this.moneypool);
+                  }
+
+              }
+
+      this._players.forEach((player) => {
+        player.emit('Booted', 'Boot');
+      });
   }
 //show the statistics of all players in the game.
   _sendPlayerStats() {
@@ -76,10 +123,14 @@ class RpsGame {
   }
 //function that checks if a game or a round within a game is over, and if so shows who one the round and game if applicable.
   _onTurn(playerIndex, turn) {
-    this._turns[playerIndex] = turn;
-    this._sendToPlayer(playerIndex, `You selected ${turn}`);
-    var n = this._checkGameOver();
+    if(this.pause === false){
+        this._turns[playerIndex] = turn;
+        this._sendToPlayer(playerIndex, `You selected ${turn}`);
+        var n = this._checkGameOver();
     //this._sendToPlayers(n);
+    }else{
+        this._sendToPlayers("The game is still paused!")
+    }
   }
 //Updates the win/loss record
   _update_wl(text){
@@ -114,7 +165,8 @@ class RpsGame {
     var y = "No";
     var m = "";
     if (turns[0] && turns[1]) {
-      this._sendToPlayers('Game over ' + turns.join(' : '));
+      this.gameCurrentlyBeingPlayed = true;
+      this._sendToPlayers('Round over ' + turns.join(' : '));
       m = this._getGameResult();
       this._turns = [null, null];
       this._sendToPlayers('Next Round!!!!');
