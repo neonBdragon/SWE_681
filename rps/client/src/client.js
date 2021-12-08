@@ -165,7 +165,7 @@ const gamepage = (e) => {
     login.style.visibility = "hidden";
     signup.style.visibility = "hidden";
     game.style.visibility = "visible";
-    writeEvent('Welcome to RPS');
+    writeEvent('Welcome to Arithmetic Guess');
     writeEvent('New Match!');
 };
 const unhidew = (e) => {

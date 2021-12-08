@@ -1,4 +1,4 @@
-class RpsGame {
+class ArithmeticGame {
 //constructor that manages a game between two players
   constructor(p1, p2, db, gameUsers) {
   //Object parameters
@@ -304,10 +304,15 @@ class RpsGame {
   }
 //decodes the turn sent by the client
   _decodeTurn(turn, player) {
-    if(player == "1" && this.lostTurns1.includes(turn)){
-        throw new Error(`This value has already been lost by the player`);
-    }else if(player == "2" && this.lostTurns2.includes(turn)){
-        throw new Error(`This value has already been lost by the player`);
+    var timer = null;
+    if(player === "1" && this.lostTurns1.includes(turn)){
+        this._bootSingle(this._players[0]);
+        this._sendToPlayer(1, "It is our belief, that your opponent attempted to cheat, you have 15 seconds to leave and restart a game, otherwise you will be forced to leave and sign back in.");
+        timer = setTimeout(() => {this._bootSingle(this._players[1]);}, 15000);
+    }else if(player === "2" && this.lostTurns2.includes(turn)){
+        this._bootSingle(this._players[1]);
+        this._sendToPlayer(0, "It is our belief, that your opponent attempted to cheat, you have 15 seconds to leave and restart a game, otherwise you will be forced to leave and sign back in.");
+        timer = setTimeout(() => {this._bootSingle(this._players[0]);}, 15000);
     }else{
         switch (turn) {
           case '200':
@@ -335,5 +340,5 @@ class RpsGame {
 
 }
 
-module.exports = RpsGame;
+module.exports = ArithmeticGame;
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const socketio = require('socket.io');
 const mysql = require('mysql');
-const RpsGame = require('./rps-game');
+const ArithmeticGame = require('./ArithmeticGame');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const fs = require('fs');
@@ -59,7 +59,7 @@ const options = {
 //creates an https server with the self signed certificate and key
 //const server = http.createServer(options, app); //This server declaration caused issues for reasons I don't understand
 const server = https.createServer(options, app).listen(process.env.SERVER_PORT, function () {
-    console.log('RPS started on 443! Go to https://localhost:443')
+    console.log('Arithmetic Game started on 443! Go to https://localhost:443')
 });
 //creates socketio connection that a client can connect to.
 const io = socketio(server);
@@ -189,7 +189,7 @@ io.on('connection', (sock) => {
                                 chats.push([waitingUser, dataUser]);
                                 console.log(chats);
                                 chatsocks.push([waitingPlayer, sock]);
-                                new RpsGame(waitingPlayer, sock, db, gameUsers);
+                                new ArithmeticGame(waitingPlayer, sock, db, gameUsers);
                                 waitingPlayer = null;
                                 waitingUser = null;
                                 gameUsers = [];
