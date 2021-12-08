@@ -26,12 +26,12 @@
     "mysql": "^2.18.1",
     "nocache": "^3.0.1",
     "prompt": "^1.2.0",
-    "prompt-sync": "^4.2.0",
+    "prompt-sync": "^4.1.6",
     "socket.io": "^2.0.3"
   },
   "devDependencies": {
     "helmet": "^4.6.0",
-    "nodemon": "^1.12.1",
+    "nodemon": "^2.0.15",
     "oracledb": "^5.3.0"
   }
 }
