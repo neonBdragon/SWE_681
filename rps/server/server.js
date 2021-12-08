@@ -284,11 +284,14 @@ io.on('connection', (sock) => {
            //console.log(chatsocks);
            console.log(users);
            //console.log(usersocks);
-           if(index != -1 && index2 != -1){
-               chats.splice(index2, 1);
-               chatsocks.splice(index2, 1);
+           if(index != -1){
+
                users.splice(index, 1);
                usersocks.splice(index, 1);
+           }
+           if(index2 != -1){
+                chats.splice(index2, 1);
+                chatsocks.splice(index2, 1);
            }
 
           //users = users.filter(e => e !== text);
