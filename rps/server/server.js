@@ -234,7 +234,7 @@ io.on('connection', (sock) => {
                     if (err) console.log(err);
                     pass = hash;
                     //shows hashed password
-                    sql = "INSERT into accounts (username, password) VALUES (" + db.escape(user) + ", " + db.escape(pass) + ")";
+                    sql = "INSERT into accounts (username, password, Wins, Losses) VALUES (" + db.escape(user) + ", " + db.escape(pass) + ", 0, 0)";
 
                     var query = db.query(sql, function (error, results, fields) {
                         if (error) throw error;

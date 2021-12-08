@@ -157,9 +157,9 @@ class ArithmeticGame {
       var username = "";
       var sql = "";
       if(status == "win"){
-      	sql = "UPDATE accounts SET Wins = Wins + 1 Where username=" + this.db.escape(user);
+      	sql = "UPDATE accounts SET Wins = Wins + 1 WHERE username=" + this.db.escape(user) + " AND Id <> 0";
       }else{
-  	    sql = "UPDATE accounts SET Losses = Losses + 1 Where username=" + this.db.escape(user);
+  	    sql = "UPDATE accounts SET Losses = Losses + 1 WHERE username=" + this.db.escape(user) + " AND Id <> 0";
       }
 
       this.db.query(sql, function(err, rows, fields){
