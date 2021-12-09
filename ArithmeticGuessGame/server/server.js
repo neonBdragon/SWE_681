@@ -312,13 +312,13 @@ io.on('connection', (sock) => {
         index = -1;
         index2 = -1;
         for (i = 0; i < users.length; i++) {
-            console.log(users[i]);
+            
             if (users[i] === text) {
                 index = i;
             }
         }
         for (i = 0; i < chats.length; i++) {
-            console.log(chats[i]);
+
             if (chats[i][0] === text || chats[i][1] === text) {
                 index2 = i;
             }

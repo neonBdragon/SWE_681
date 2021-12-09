@@ -1,6 +1,6 @@
 const array = [];
 
-
+//Write a message event
 const writeEvent = (text) => {
 
     // <ul> element
@@ -13,7 +13,7 @@ const writeEvent = (text) => {
     parent.appendChild(el);
 
 };
-
+// Alert that there is or is not any user.
 const noUser = (text) => {
 
     // <ul> element
@@ -26,13 +26,14 @@ const noUser = (text) => {
     parent.appendChild(el);
 
 };
-
+//Displays winning message
 const displayWinner = (text) => {
     const parent = document.querySelector('#events');
     const el = document.createElement('li');
     el.innerHTML = text;
     parent.appendChild(el);
 };
+//Play request method
 const playRequest = (text) => {
     const parent = document.querySelector('#events');
     const el = document.createElement('li');
@@ -40,6 +41,7 @@ const playRequest = (text) => {
     parent.appendChild(el);
     yesno.style.visibility = "visible";
 };
+
 const play = (text) => {
     if (text == "yes") {
         // Save it!
@@ -70,6 +72,7 @@ const waiting = (text) => {
 
 
 };
+//Emits a loser method
 const loser = (text) => {
     const parent = document.querySelector('#events');
     const el = document.createElement('li');
@@ -79,7 +82,7 @@ const loser = (text) => {
     array.push(rem);
     rem.parentNode.removeChild(rem);
 };
-
+//Reset game buttons
 const reset = (text) => {
     rem = document.getElementById("Pause");
     array.push(rem);
@@ -100,7 +103,7 @@ const reset = (text) => {
     //game.style.visibility = "visible";
     sock.emit('message', 'New Match!');
 };
-
+//Listens for chat
 const onFormSubmitted = (e) => {
     e.preventDefault();
 
@@ -115,7 +118,7 @@ const onFormSubmitted = (e) => {
         sock.emit("Bet", b);
     }
 };
-
+//Listens to value buttons
 const addButtonListeners = () => {
 
     ['200', '150', '100', '75', '50', '25', '10'].forEach((id) => {
@@ -125,6 +128,8 @@ const addButtonListeners = () => {
         });
     });
 };
+
+//Listens for action buttons that are not moves
 const addButtonListeners2 = () => {
     ['Login_Register', 'Leave', 'yes', 'no', 'Login_RegisterNew', 'Pause'].forEach((id) => {
         const button = document.getElementById(id);
@@ -159,6 +164,7 @@ const addButtonListeners2 = () => {
         }
     });
 };
+//Unhides gamepage
 const gamepage = (e) => {
     login.style.visibility = "hidden";
     signup.style.visibility = "hidden";
@@ -166,11 +172,13 @@ const gamepage = (e) => {
     writeEvent('Welcome to Arithmetic Guess');
     writeEvent('New Match!');
 };
+//Unhides login
 const unhidew = (e) => {
     login.style.visibility = "hidden";
     wait.style.visibility = "visible";
 
 };
+//Follows direction of server when booting player
 const boot = (e) => {
     sock.emit("remove user", username);
     sock.emit("Leaving Game", username);
