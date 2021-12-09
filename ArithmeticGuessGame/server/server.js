@@ -312,7 +312,7 @@ io.on('connection', (sock) => {
         index = -1;
         index2 = -1;
         for (i = 0; i < users.length; i++) {
-            
+
             if (users[i] === text) {
                 index = i;
             }
