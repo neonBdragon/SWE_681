@@ -172,7 +172,7 @@ io.on('connection', (sock) => {
                     //io.emit("logged_in", {user: user});
                     //});
                 } else {
-                    console.log("here");
+                    //console.log("here");
                     var found = true;
                 }
                 if (found && !(users.includes(user))) {
@@ -212,7 +212,7 @@ io.on('connection', (sock) => {
                             users.push(dataUser);
                             usersocks.push(sock);
                             gameUsers.push(dataUser);
-                            console.log(users);
+                            //console.log(users);
 
                             //io.emit("unhide waiting", dataUser);
                             //sock.emit("unhidew", "unhide");
@@ -297,7 +297,7 @@ io.on('connection', (sock) => {
         var u = x[0];
         var i = null;
         var index = null;
-        console.log(u);
+        //console.log(u);
         for (i = 0; i < chats.length; i++) {
             if (chats[i][0] === u || chats[i][1] === u) {
                 index = i;
@@ -353,11 +353,11 @@ io.on('connection', (sock) => {
                 index2 = i;
             }
         }
-        console.log(index);
-        console.log(index2);
-        console.log(chats);
+        //console.log(index);
+        //console.log(index2);
+        //console.log(chats);
         //console.log(chatsocks);
-        console.log(users);
+        //console.log(users);
         //console.log(usersocks);
         if (index != -1) {
 
@@ -371,9 +371,9 @@ io.on('connection', (sock) => {
 
         //users = users.filter(e => e !== text);
         //usersocks = usersocks.filter(e => e !== usersocks[index]);
-        console.log(chats);
+        //console.log(chats);
         //console.log(chatsocks);
-        console.log(users);
+        //console.log(users);
         //console.log(usersocks);
 
 
