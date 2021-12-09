@@ -1,10 +1,12 @@
-const { encrypt, decrypt } = require('./crypto');
+const {encrypt, decrypt} = require('./crypto');
 const prompt = require('prompt');
 const fs = require('fs');
 
 prompt.start();
 prompt.get(['username', 'password'], function (err, result) {
-    if (err) { return onErr(err); }
+    if (err) {
+        return onErr(err);
+    }
     console.log('Input received!');
     encode(result);
 });

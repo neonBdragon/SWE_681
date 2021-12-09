@@ -8,43 +8,43 @@ const fs = require('fs');
 const https = require("https");
 const bcrypt = require("bcrypt");
 const config = require('./config.js');
-const env = require('dotenv').config();
 const helmet = require("helmet");
 const nocache = require("nocache");
 console.log(config);
 const salt = 10;
-const { createLogger, format, transports } = require('winston');
-const { combine, timestamp, prettyPrint } = format;
+const {createLogger, format, transports} = require('winston');
+const {combine, timestamp, prettyPrint} = format;
+
 //express app declaration
 const app = express();
 
+// Random string generator
 const Crypto = require('crypto');
+
 function genuuid(size = 128) {
     return Crypto
         .randomBytes(size)
         .toString('base64')
-        .replace(/\//g,'_') //Replaces / with _
-        .replace(/\+/g,'-') //Replaces + with -
+        .replace(/\//g, '_') //Replaces / with _
+        .replace(/\+/g, '-') //Replaces + with -
         .slice(0, size)
 }
 
 // Logging
-
-
 const logger = createLogger({
     level: 'info',
     format: combine(
         timestamp(),
         prettyPrint()
     ),
-    defaultMeta: { service: 'user-service' },
+    defaultMeta: {service: 'user-service'},
     transports: [
         //
         // - Write all logs with level `error` and below to `error.log`
         // - Write all logs with level `info` and below to `combined.log`
         //
-        new transports.File({ filename: 'logs/error.log', level: 'error' }),
-        new transports.File({ filename: 'logs/combined.log' }),
+        new transports.File({filename: 'logs/error.log', level: 'error'}),
+        new transports.File({filename: 'logs/combined.log'}),
     ],
 });
 
@@ -94,10 +94,11 @@ const options = {
 const server = https.createServer(options, app).listen(process.env.SERVER_PORT, function () {
     logger.info('Arithmetic Game started on 443! Go to https://localhost:443')
 });
+
 //creates socketio connection that a client can connect to.
 const io = socketio(server);
 const sessionMiddleware = session({
-    genid: function(req) {
+    genid: function (req) {
         return genuuid(); // use UUIDs for session IDs
     },
     secret: config.secret,
@@ -144,15 +145,7 @@ var approvedemitters = [];
 //Handling client connections and events.
 io.on('connection', (sock) => {
     var req = sock.request;
-    /*
-    if (req.session.userID != null) {
-        var userId = req.session.userID;
-        var sql = "SELECT * FROM accounts WHERE id=" + db.escape(userID);
-        db.query(sql, function (err, rows, fields) {
-            if (error) throw error;
-            io.emit("logged_in", {user: rows[0].Username});
-        });
-    }*/
+
 //login verification
     sock.on("log", (data) => {
 
@@ -168,11 +161,7 @@ io.on('connection', (sock) => {
                 if (rows.length == 0) {
                     console.log("nothing here");
                     sock.emit("No User", "Invalid Password and/or Username!");
-
-                    //io.emit("logged_in", {user: user});
-                    //});
                 } else {
-                    //console.log("here");
                     var found = true;
                 }
                 if (found && !(users.includes(user))) {
@@ -212,11 +201,6 @@ io.on('connection', (sock) => {
                             users.push(dataUser);
                             usersocks.push(sock);
                             gameUsers.push(dataUser);
-                            //console.log(users);
-
-                            //io.emit("unhide waiting", dataUser);
-                            //sock.emit("unhidew", "unhide");
-
 
                             if (waitingPlayer) {
 
@@ -234,13 +218,9 @@ io.on('connection', (sock) => {
                                 waitingPlayer.emit("unhide");
                                 waitingPlayer.emit('message', 'Waiting for an opponent');
                             }
-
-
                         }
 
                     });
-
-
                 }
                 if (found && users.includes(user)) {
                     logger.info("This user is already logged in!");
@@ -251,8 +231,8 @@ io.on('connection', (sock) => {
             logger.info("invalid username");
             sock.emit("No User", "Invalid Password and/or Username!");
         }
-
     });
+
 //creating a new account
     sock.on('New', (text) => {
         console.log('Hello new')
@@ -272,15 +252,9 @@ io.on('connection', (sock) => {
 
                     var query = db.query(sql, function (error, results, fields) {
                         if (error) throw error;
-                        // Neat!
                     });
-
-                    //db.query(sql, function(err, rows, fields){});
                     logger.info("New Account!");
                     sock.emit("No User", "Successful Registration. Please sign in above");
-                    //io.emit("logged_in", {user: user});
-                    //});
-                    //>>query logic should go here.
                 });
 
             } else {
@@ -291,19 +265,18 @@ io.on('connection', (sock) => {
             }
         });
     });
+
 //listening for message event and passing it to the appropriate socket.
     sock.on('message', (text) => {
         var x = text.split(":");
         var u = x[0];
         var i = null;
         var index = null;
-        //console.log(u);
         for (i = 0; i < chats.length; i++) {
             if (chats[i][0] === u || chats[i][1] === u) {
                 index = i;
             }
         }
-        //chats.some(row => row.includes(u))
         if (index != null) {
 
             console.log(index);
@@ -314,10 +287,7 @@ io.on('connection', (sock) => {
                 chatsocks[index][1].emit('Bet', b);
                 chatsocks[index][0].emit('message', 'bet is in! ' + b);
                 chatsocks[index][1].emit('message', 'bet is in! ' + b);
-                //io.emit('Bet', b);
-                //io.emit('message', 'bet is in! ' + b);
             }
-            //io.emit('message', text);
             chatsocks[index][0].emit('message', text);
             chatsocks[index][1].emit('message', text);
         } else {
@@ -353,12 +323,6 @@ io.on('connection', (sock) => {
                 index2 = i;
             }
         }
-        //console.log(index);
-        //console.log(index2);
-        //console.log(chats);
-        //console.log(chatsocks);
-        //console.log(users);
-        //console.log(usersocks);
         if (index != -1) {
 
             users.splice(index, 1);
@@ -368,15 +332,6 @@ io.on('connection', (sock) => {
             chats.splice(index2, 1);
             chatsocks.splice(index2, 1);
         }
-
-        //users = users.filter(e => e !== text);
-        //usersocks = usersocks.filter(e => e !== usersocks[index]);
-        //console.log(chats);
-        //console.log(chatsocks);
-        //console.log(users);
-        //console.log(usersocks);
-
-
     });
 
 
@@ -385,7 +340,3 @@ io.on('connection', (sock) => {
 server.on('error', (err) => {
     logger.error('Server error:', err);
 });
-
-/*server.listen(8080, () => {
-  console.log('RPS started on 8080! Go to https://localhost:8080');
-});*/ // Not needed as added listen to the server declaration

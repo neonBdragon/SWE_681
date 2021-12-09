@@ -2,12 +2,13 @@ const dotenv = require('dotenv');
 dotenv.config(); //Loads file content into environment variables
 
 const Crypto = require('crypto')
+
 function randomString(size = 128) {
     return Crypto
         .randomBytes(size)
         .toString('base64')
-        .replace(/\//g,'_') //Replaces / with _
-        .replace(/\+/g,'-') //Replaces + with -
+        .replace(/\//g, '_') //Replaces / with _
+        .replace(/\+/g, '-') //Replaces + with -
         .slice(0, size)
 }
 

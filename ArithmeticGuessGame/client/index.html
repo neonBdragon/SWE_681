@@ -1,48 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Arithmetic Guess</title>
-  <link rel="stylesheet" href="styles/main.css">
+    <title>Arithmetic Guess</title>
+    <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
 
 
 <div id="div1" class="rps-wrapper">
-  <ul id="events"></ul>
-  <div class="controls">
-    <div class="chat-wrapper">
-      <form id="chat-form">
-        <input id="chat" autocomplete="off" title="chat"/>
-        <button id="say">Say</button>
-      </form>
-    </div>
+    <ul id="events"></ul>
+    <div class="controls">
+        <div class="chat-wrapper">
+            <form id="chat-form">
+                <input id="chat" autocomplete="off" title="chat"/>
+                <button id="say">Say</button>
+            </form>
+        </div>
 
-    <div class="button-wrapper" id="buttons">
-      <button id="200" class="turn">200</button>
-      <button id="150" class="turn">150</button>
-      <button id="100" class="turn">100</button>
-      <button id="75" class="turn">75</button>
-      <button id="50" class="turn">50</button>
-      <button id="25" class="turn">25</button>
-      <button id="10" class="turn">10</button>
-      <button id="Pause" class="turn">Pause/Play</button>
-      <button id="Leave" class="turn">Leave</button>
+        <div class="button-wrapper" id="buttons">
+            <button id="200" class="turn">200</button>
+            <button id="150" class="turn">150</button>
+            <button id="100" class="turn">100</button>
+            <button id="75" class="turn">75</button>
+            <button id="50" class="turn">50</button>
+            <button id="25" class="turn">25</button>
+            <button id="10" class="turn">10</button>
+            <button id="Pause" class="turn">Pause/Play</button>
+            <button id="Leave" class="turn">Leave</button>
+        </div>
     </div>
-  </div>
 </div>
 <div class="n_log_in" id="divlog">
-  <h1>Arithmetic Guess</h1>
-  <p>Sign In</p>
-  <input type="text" id="userName" placeholder="Username..." /><br>
-  <input type="password" id ="Password" placeholder="Password..." /><br>
-  <button id="Login_Register">Login</button>
+    <h1>Arithmetic Guess</h1>
+    <p>Sign In</p>
+    <input type="text" id="userName" placeholder="Username..."/><br>
+    <input type="password" id="Password" placeholder="Password..."/><br>
+    <button id="Login_Register">Login</button>
 </div>
 
 <div class="n_log_in" id="divlog2">
-  <p>Sign Up</p>
-  <input type="text" id="userNameNew" placeholder="Username..."/><br>
-  <input type="password" id="PasswordNew" placeholder="Password..."/><br>
-  <button id="Login_RegisterNew">Register</button>
+    <p>Sign Up</p>
+    <input type="text" id="userNameNew" placeholder="Username..."/><br>
+    <input type="password" id="PasswordNew" placeholder="Password..."/><br>
+    <button id="Login_RegisterNew">Register</button>
 </div>
 <script src="/socket.io/socket.io.js"></script>
 <script src="src/client.js"></script>
