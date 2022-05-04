@@ -138,7 +138,7 @@ app.use(express.static('./'));
 var users = [];
 var usersocks = [];
 const loginregex = new RegExp("^([A-Za-z0-9_@./#&+-]{8,32})$");
-const userReg = new RegExp("^([A-Za-z0-9])+$")
+const userReg = new RegExp("^([A-Za-z0-9])+$");
 var gameUsers = [];
 var messages = [];
 var approvedemitters = [];
